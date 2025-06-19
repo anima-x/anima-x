@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Generate Screenshots</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .screenshot {
+            margin: 20px 0;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .screenshot canvas {
+            display: block;
+            width: 400px;
+            height: 300px;
+        }
+        .screenshot-info {
+            padding: 15px;
+            background-color: #f9f9f9;
+        }
+        button {
+            background: #049EF4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0384d1;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Generate Example Screenshots</h1>
+        <p>This page generates preview images for the examples.</p>
+        
+        <div class="grid">
+            <div class="screenshot">
+                <canvas id="laptopCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Laptop Animation</h3>
+                    <p>File: webgl_animation_keyframes_laptop.jpg</p>
+                    <button onclick="generateLaptopScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('laptopCanvas', 'webgl_animation_keyframes_laptop.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="vroidCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Character Animation</h3>
+                    <p>File: webgl_animation_keyframes_vroid.jpg</p>
+                    <button onclick="generateVroidScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('vroidCanvas', 'webgl_animation_keyframes_vroid.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="humansCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Human Animations</h3>
+                    <p>File: webgl_animation_keyframes_humans.jpg</p>
+                    <button onclick="generateHumansScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('humansCanvas', 'webgl_animation_keyframes_humans.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="flagCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Flag Animation</h3>
+                    <p>File: webgl_animation_keyframes_flag.jpg</p>
+                    <button onclick="generateFlagScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('flagCanvas', 'webgl_animation_keyframes_flag.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="birdCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Bird Animation</h3>
+                    <p>File: webgl_animation_keyframes_bird.jpg</p>
+                    <button onclick="generateBirdScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('birdCanvas', 'webgl_animation_keyframes_bird.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="beerCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Beer Walk</h3>
+                    <p>File: webgl_animation_keyframes_beer.jpg</p>
+                    <button onclick="generateBeerScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('beerCanvas', 'webgl_animation_keyframes_beer.jpg')">Download</button>
+                </div>
+            </div>
+
+            <div class="screenshot">
+                <canvas id="animalsCanvas" width="400" height="300"></canvas>
+                <div class="screenshot-info">
+                    <h3>Animal Animations</h3>
+                    <p>File: webgl_animation_keyframes_animals.jpg</p>
+                    <button onclick="generateAnimalsScreenshot()">Generate Screenshot</button>
+                    <button onclick="downloadScreenshot('animalsCanvas', 'webgl_animation_keyframes_animals.jpg')">Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Three.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/DRACOLoader.js"></script>
+
+    <script>
+        function generateLaptopScreenshot() {
+            const canvas = document.getElementById('laptopCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create laptop model
+            function createLaptopModel() {
+                // Base
+                const baseGeometry = new THREE.BoxGeometry(2, 0.1, 3);
+                const baseMaterial = new THREE.MeshPhongMaterial({ color: 0x404040 });
+                const base = new THREE.Mesh(baseGeometry, baseMaterial);
+                base.position.y = 0.05;
+                scene.add(base);
+
+                // Screen
+                const screenGeometry = new THREE.BoxGeometry(2, 0.05, 3);
+                const screenMaterial = new THREE.MeshPhongMaterial({ color: 0x202020 });
+                const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+                screen.position.set(0, 1.05, 0);
+                screen.rotation.x = -Math.PI / 6; // Slightly open
+                scene.add(screen);
+
+                // Screen content
+                const screenContentGeometry = new THREE.PlaneGeometry(1.8, 2.8);
+                const screenContentMaterial = new THREE.MeshBasicMaterial({ color: 0x87CEEB });
+                const screenContent = new THREE.Mesh(screenContentGeometry, screenContentMaterial);
+                screenContent.position.set(0, 1.05, 0.01);
+                screenContent.rotation.x = -Math.PI / 6;
+                scene.add(screenContent);
+
+                // Keyboard
+                const keyboardGeometry = new THREE.PlaneGeometry(1.8, 2.8);
+                const keyboardMaterial = new THREE.MeshPhongMaterial({ color: 0x303030 });
+                const keyboard = new THREE.Mesh(keyboardGeometry, keyboardMaterial);
+                keyboard.position.set(0, 0.06, 0);
+                keyboard.rotation.x = -Math.PI / 2;
+                scene.add(keyboard);
+            }
+
+            createLaptopModel();
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateVroidScreenshot() {
+            const canvas = document.getElementById('vroidCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create character model
+            function createCharacterModel() {
+                // Body
+                const bodyGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1.5, 8);
+                const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x87CEEB });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.y = 0.75;
+                scene.add(body);
+
+                // Head
+                const headGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+                const headMaterial = new THREE.MeshPhongMaterial({ color: 0xFFE4B5 });
+                const head = new THREE.Mesh(headGeometry, headMaterial);
+                head.position.set(0, 1.8, 0);
+                scene.add(head);
+
+                // Arms
+                const armGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8);
+                const armMaterial = new THREE.MeshPhongMaterial({ color: 0x87CEEB });
+                const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+                leftArm.position.set(-0.6, 1.2, 0);
+                leftArm.rotation.z = Math.PI / 4;
+                scene.add(leftArm);
+
+                const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+                rightArm.position.set(0.6, 1.2, 0);
+                rightArm.rotation.z = -Math.PI / 4;
+                scene.add(rightArm);
+
+                // Legs
+                const legGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
+                const legMaterial = new THREE.MeshPhongMaterial({ color: 0x000080 });
+                const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+                leftLeg.position.set(-0.2, 0.4, 0);
+                scene.add(leftLeg);
+
+                const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+                rightLeg.position.set(0.2, 0.4, 0);
+                scene.add(rightLeg);
+            }
+
+            createCharacterModel();
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateHumansScreenshot() {
+            const canvas = document.getElementById('humansCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(0, 2, 8);
+            camera.lookAt(0, 1, 0);
+
+            // Create multiple human models
+            function createHumanModel(x, color) {
+                // Body
+                const bodyGeometry = new THREE.CylinderGeometry(0.3, 0.4, 1.5, 8);
+                const bodyMaterial = new THREE.MeshPhongMaterial({ color: color });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(x, 0.75, 0);
+                scene.add(body);
+
+                // Head
+                const headGeometry = new THREE.SphereGeometry(0.3, 8, 8);
+                const headMaterial = new THREE.MeshPhongMaterial({ color: 0xFFE4B5 });
+                const head = new THREE.Mesh(headGeometry, headMaterial);
+                head.position.set(x, 1.8, 0);
+                scene.add(head);
+
+                // Arms
+                const armGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8, 8);
+                const armMaterial = new THREE.MeshPhongMaterial({ color: color });
+                const leftArm = new THREE.Mesh(armGeometry, armMaterial);
+                leftArm.position.set(x - 0.6, 1.2, 0);
+                leftArm.rotation.z = Math.PI / 4;
+                scene.add(leftArm);
+
+                const rightArm = new THREE.Mesh(armGeometry, armMaterial);
+                rightArm.position.set(x + 0.6, 1.2, 0);
+                rightArm.rotation.z = -Math.PI / 4;
+                scene.add(rightArm);
+
+                // Legs
+                const legGeometry = new THREE.CylinderGeometry(0.15, 0.15, 0.8, 8);
+                const legMaterial = new THREE.MeshPhongMaterial({ color: 0x000080 });
+                const leftLeg = new THREE.Mesh(legGeometry, legMaterial);
+                leftLeg.position.set(x - 0.2, 0.4, 0);
+                scene.add(leftLeg);
+
+                const rightLeg = new THREE.Mesh(legGeometry, legMaterial);
+                rightLeg.position.set(x + 0.2, 0.4, 0);
+                scene.add(rightLeg);
+            }
+
+            createHumanModel(-2, 0xFF6B6B);
+            createHumanModel(0, 0x4ECDC4);
+            createHumanModel(2, 0x45B7D1);
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateFlagScreenshot() {
+            const canvas = document.getElementById('flagCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create flag model
+            function createFlagModel() {
+                // Pole
+                const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 4, 8);
+                const poleMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+                const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+                pole.position.set(0, 2, 0);
+                scene.add(pole);
+
+                // Flag
+                const flagGeometry = new THREE.PlaneGeometry(2, 1);
+                const flagMaterial = new THREE.MeshPhongMaterial({ color: 0xFF0000 });
+                const flag = new THREE.Mesh(flagGeometry, flagMaterial);
+                flag.position.set(1, 3, 0);
+                flag.rotation.z = Math.PI / 8; // Slightly waving
+                scene.add(flag);
+            }
+
+            createFlagModel();
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateBirdScreenshot() {
+            const canvas = document.getElementById('birdCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create bird model
+            function createBirdModel() {
+                // Body
+                const bodyGeometry = new THREE.SphereGeometry(0.4, 8, 8);
+                const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
+                const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                body.position.set(0, 2, 0);
+                scene.add(body);
+
+                // Head
+                const headGeometry = new THREE.SphereGeometry(0.2, 8, 8);
+                const headMaterial = new THREE.MeshPhongMaterial({ color: 0xFFFFFF });
+                const head = new THREE.Mesh(headGeometry, headMaterial);
+                head.position.set(0.5, 2.3, 0);
+                scene.add(head);
+
+                // Beak
+                const beakGeometry = new THREE.ConeGeometry(0.05, 0.2, 8);
+                const beakMaterial = new THREE.MeshPhongMaterial({ color: 0xFFA500 });
+                const beak = new THREE.Mesh(beakGeometry, beakMaterial);
+                beak.position.set(0.7, 2.3, 0);
+                beak.rotation.z = Math.PI / 2;
+                scene.add(beak);
+
+                // Wings
+                const wingGeometry = new THREE.PlaneGeometry(0.8, 0.4);
+                const wingMaterial = new THREE.MeshPhongMaterial({ color: 0x87CEEB });
+                const leftWing = new THREE.Mesh(wingGeometry, wingMaterial);
+                leftWing.position.set(-0.8, 2, 0);
+                leftWing.rotation.z = Math.PI / 4;
+                scene.add(leftWing);
+
+                const rightWing = new THREE.Mesh(wingGeometry, wingMaterial);
+                rightWing.position.set(0.8, 2, 0);
+                rightWing.rotation.z = -Math.PI / 4;
+                scene.add(rightWing);
+            }
+
+            createBirdModel();
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateBeerScreenshot() {
+            const canvas = document.getElementById('beerCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create beer bottle model
+            function createBeerModel() {
+                // Bottle body
+                const bottleGeometry = new THREE.CylinderGeometry(0.3, 0.3, 2, 8);
+                const bottleMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+                const bottle = new THREE.Mesh(bottleGeometry, bottleMaterial);
+                bottle.position.set(0, 1, 0);
+                scene.add(bottle);
+
+                // Bottle neck
+                const neckGeometry = new THREE.CylinderGeometry(0.2, 0.2, 0.5, 8);
+                const neckMaterial = new THREE.MeshPhongMaterial({ color: 0x8B4513 });
+                const neck = new THREE.Mesh(neckGeometry, neckMaterial);
+                neck.position.set(0, 2.25, 0);
+                scene.add(neck);
+
+                // Bottle cap
+                const capGeometry = new THREE.CylinderGeometry(0.25, 0.25, 0.1, 8);
+                const capMaterial = new THREE.MeshPhongMaterial({ color: 0xFFD700 });
+                const cap = new THREE.Mesh(capGeometry, capMaterial);
+                cap.position.set(0, 2.55, 0);
+                scene.add(cap);
+
+                // Beer liquid
+                const liquidGeometry = new THREE.CylinderGeometry(0.28, 0.28, 1.8, 8);
+                const liquidMaterial = new THREE.MeshPhongMaterial({ color: 0xFFD700 });
+                const liquid = new THREE.Mesh(liquidGeometry, liquidMaterial);
+                liquid.position.set(0, 1, 0);
+                scene.add(liquid);
+            }
+
+            createBeerModel();
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function generateAnimalsScreenshot() {
+            const canvas = document.getElementById('animalsCanvas');
+            const renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+            renderer.setSize(400, 300);
+            renderer.setClearColor(0xa0a0a0);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xa0a0a0);
+
+            // Lighting
+            const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+            hemiLight.position.set(0, 20, 0);
+            scene.add(hemiLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+            dirLight.position.set(3, 10, 10);
+            scene.add(dirLight);
+
+            // Ground
+            const ground = new THREE.Mesh(
+                new THREE.PlaneGeometry(100, 100),
+                new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false })
+            );
+            ground.rotation.x = -Math.PI / 2;
+            scene.add(ground);
+
+            // Camera
+            const camera = new THREE.PerspectiveCamera(40, 400 / 300, 1, 100);
+            camera.position.set(-1, 3, 8);
+
+            // Create animal models
+            function createAnimalModel(x, color, type) {
+                if (type === 'quadruped') {
+                    // Body
+                    const bodyGeometry = new THREE.BoxGeometry(1, 0.6, 1.5);
+                    const bodyMaterial = new THREE.MeshPhongMaterial({ color: color });
+                    const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+                    body.position.set(x, 0.3, 0);
+                    scene.add(body);
+
+                    // Head
+                    const headGeometry = new THREE.BoxGeometry(0.6, 0.5, 0.8);
+                    const headMaterial = new THREE.MeshPhongMaterial({ color: color });
+                    const head = new THREE.Mesh(headGeometry, headMaterial);
+                    head.position.set(x + 0.8, 0.5, 0);
+                    scene.add(head);
+
+                    // Legs
+                    const legGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.6, 8);
+                    const legMaterial = new THREE.MeshPhongMaterial({ color: color });
+                    const legs = [
+                        { x: x - 0.4, z: -0.6 },
+                        { x: x + 0.4, z: -0.6 },
+                        { x: x - 0.4, z: 0.6 },
+                        { x: x + 0.4, z: 0.6 }
+                    ];
+                    legs.forEach(leg => {
+                        const legMesh = new THREE.Mesh(legGeometry, legMaterial);
+                        legMesh.position.set(leg.x, 0.3, leg.z);
+                        scene.add(legMesh);
+                    });
+                }
+            }
+
+            createAnimalModel(-2, 0x8B4513, 'quadruped'); // Brown animal
+            createAnimalModel(2, 0x696969, 'quadruped');  // Gray animal
+
+            // Render
+            renderer.render(scene, camera);
+        }
+
+        function downloadScreenshot(canvasId, filename) {
+            const canvas = document.getElementById(canvasId);
+            const link = document.createElement('a');
+            link.download = filename;
+            link.href = canvas.toDataURL('image/jpeg', 0.8);
+            link.click();
+        }
+
+        // Generate initial screenshots
+        generateLaptopScreenshot();
+        generateVroidScreenshot();
+        generateHumansScreenshot();
+        generateFlagScreenshot();
+        generateBirdScreenshot();
+        generateBeerScreenshot();
+        generateAnimalsScreenshot();
+    </script>
+</body>
+</html> 

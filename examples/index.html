@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<title>AnimaX Examples</title>
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		:root {
+			color-scheme: light dark;
+			--background-color: #fff;
+			--secondary-background-color: #f7f7f7;
+			--color-blue: #049EF4;
+			--text-color: #444;
+			--secondary-text-color: #9e9e9e;
+			--font-size: 16px;
+			--line-height: 26px;
+			--border-color: #E8E8E8;
+			--border-style: 1px solid var(--border-color);
+			--header-height: 48px;
+			--panel-width: 300px;
+			--panel-padding: 16px;
+			--icon-size: 20px;
+		}
+
+		@media (prefers-color-scheme: dark) {
+			:root {
+				--background-color: #222;
+				--secondary-background-color: #2e2e2e;
+				--text-color: #bbb;
+				--secondary-text-color: #666;
+				--border-color: #444;
+				--border-style: 1px solid var(--border-color);
+			}
+		}
+
+		* {
+			box-sizing: border-box;
+			-webkit-font-smoothing: antialiased;
+			-moz-osx-font-smoothing: grayscale;
+		}
+
+		html,
+		body {
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: 'Roboto Mono', monospace;
+			color: var(--text-color);
+			background-color: var(--background-color);
+		}
+
+		a {
+			text-decoration: none;
+		}
+
+		h1 {
+			font-size: 18px;
+			line-height: 24px;
+			font-weight: 500;
+		}
+
+		h2 {
+			padding: 0;
+			margin: 16px 0;
+			font-size: calc(var(--font-size) - 1px);
+			line-height: var(--line-height);
+			font-weight: 500;
+			color: var(--color-blue);
+		}
+
+		#header {
+			display: flex;
+			height: var(--header-height);
+			border-bottom: var(--border-style);
+			align-items: center;
+		}
+
+		#header h1 {
+			padding-left: var(--panel-padding);
+			flex: 1;
+			display: flex;
+			align-items: center;
+			color: var(--color-blue);
+		}
+
+		#panel {
+			position: fixed;
+			z-index: 100;
+			left: 0px;
+			width: var(--panel-width);
+			height: 100%;
+			overflow: auto;
+			border-right: var(--border-style);
+			display: flex;
+			flex-direction: column;
+			background-color: var(--background-color);
+		}
+
+		#inputWrapper {
+			display: flex;
+			align-items: center;
+			border-bottom: var(--border-style);
+			position: relative;
+		}
+
+		#filterInput {
+			flex: 1;
+			height: 48px;
+			border: 0;
+			padding: 0 var(--panel-padding);
+			font-family: inherit;
+			font-size: inherit;
+			background-color: inherit;
+			color: inherit;
+			outline: none;
+		}
+
+		#contentWrapper {
+			flex: 1;
+			overflow: auto;
+		}
+
+		#content {
+			padding: var(--panel-padding);
+		}
+
+		#content h2:not(.hidden) {
+			margin-top: 24px;
+		}
+
+		#content h2:not(.hidden)~h2 {
+			margin-top: 16px;
+		}
+
+		.card {
+			display: block;
+			margin-bottom: 16px;
+			border-radius: 4px;
+			overflow: hidden;
+			transition: background-color 0.2s;
+		}
+
+		.card:hover {
+			background-color: var(--secondary-background-color);
+		}
+
+		.card.selected {
+			background-color: var(--color-blue);
+			color: white;
+		}
+
+		.card .cover {
+			position: relative;
+			width: 100%;
+			height: 150px;
+			background-color: var(--secondary-background-color);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+
+		.card .cover img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.card .title {
+			padding: 12px;
+			font-size: calc(var(--font-size) - 2px);
+			line-height: var(--line-height);
+			color: inherit;
+		}
+
+		.card .tag {
+			display: inline-block;
+			background-color: var(--color-blue);
+			color: white;
+			padding: 2px 6px;
+			border-radius: 2px;
+			font-size: 11px;
+			margin-left: 8px;
+		}
+
+		.hidden {
+			display: none !important;
+		}
+
+		#viewer {
+			position: fixed;
+			top: 0;
+			left: var(--panel-width);
+			width: calc(100% - var(--panel-width));
+			height: 100%;
+			border: none;
+			background-color: var(--background-color);
+		}
+
+		#button {
+			position: fixed;
+			top: 16px;
+			right: 16px;
+			width: 48px;
+			height: 48px;
+			border-radius: 50%;
+			background-color: var(--color-blue);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			cursor: pointer;
+			z-index: 1000;
+			transition: background-color 0.2s;
+		}
+
+		#button:hover {
+			background-color: #0384d1;
+		}
+
+		#button img {
+			width: 24px;
+			height: 24px;
+			filter: brightness(0) invert(1);
+		}
+
+		@media all and (max-width: 640px) {
+			:root {
+				--panel-width: 100%;
+			}
+
+			#panel {
+				transform: translateX(-100%);
+				transition: transform 0.3s ease;
+			}
+
+			#panel.open {
+				transform: translateX(0);
+			}
+
+			#panelScrim {
+				position: fixed;
+				top: 0;
+				left: 0;
+				width: 100%;
+				height: 100%;
+				background-color: rgba(0, 0, 0, 0.5);
+				z-index: 99;
+				display: none;
+			}
+
+			#panel.open #panelScrim {
+				display: block;
+			}
+
+			#viewer {
+				left: 0;
+				width: 100%;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<div id="panel">
+		<div id="header">
+			<h1>AnimaX Examples</h1>
+		</div>
+
+		<div id="panelScrim"></div>
+
+		<div id="contentWrapper">
+			<div id="inputWrapper">
+				<input placeholder="Search examples..." type="text" id="filterInput" autocorrect="off"
+					autocapitalize="off" spellcheck="false" />
+			</div>
+
+			<div id="content">
+				<!-- <h2 data-category="animations">Animations</h2> -->
+				<!-- <div class="card" data-file="webgl_animation_keyframes_laptop">
+					<a href="webgl_animation_keyframes_laptop.html" target="viewer">
+						<div class="cover">
+							<img src="screenshots/webgl_animation_keyframes_laptop.jpg" alt="Laptop Animation" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjEwMCIgeT0iNzUiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjBGMEYwIi8+CjxyZWN0IHg9IjExMCIgeT0iODUiIHdpZHRoPSIxODAiIGhlaWdodD0iMTMwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjEyMCIgeT0iOTUiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTEwIiBmaWxsPSIjRjBGMEYwIi8+CjxyZWN0IHg9IjEzMCIgeT0iMjAwIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjRjVGNUY1Ii8+Cjwvc3ZnPgo='" />
+						</div>
+						<div class="title">Laptop Animation</div>
+					</a>
+				</div> -->
+			</div>
+		</div>
+	</div>
+
+	<iframe id="viewer" name="viewer" allow="fullscreen; xr-spatial-tracking;"></iframe>
+
+	<a id="button" target="_blank" title="View source code">
+		<img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTkgMTFIMTNWMTNIOVYxMVoiIGZpbGw9IndoaXRlIi8+CjxwYXRoIGQ9Ik0xMyAxNUg5VjE3SDEzVjE1WiIgZmlsbD0id2hpdGUiLz4KPHBhdGggZD0iTTE5IDNINUMzLjkgMyAzIDMuOSAzIDVWMTlDMyAyMC4xIDMuOSAyMSA1IDIxSDE5QzIwLjEgMjEgMjEgMjAuMSAyMSAxOVY1QzIxIDMuOSAyMC4xIDMgMTkgM1pNMTkgMTlINVY1SDE5VjE5WiIgZmlsbD0id2hpdGUiLz4KPC9zdmc+Cg=="
+			alt="View source" />
+	</a>
+
+	<script>
+		const panel = document.getElementById('panel');
+		const content = document.getElementById('content');
+		const viewer = document.getElementById('viewer');
+		const filterInput = document.getElementById('filterInput');
+		const viewSrcButton = document.getElementById('button');
+		const panelScrim = document.getElementById('panelScrim');
+
+		const links = {};
+		const validRedirects = new Map();
+		let selected = null;
+
+		// Example data
+		const examples = {
+			'animations': [
+				{
+					file: 'webgl_animation_keyframes_laptop',
+					title: 'Laptop Animation',
+					description: 'A 3D laptop model with closing animation and typing effect'
+				},
+				{
+					file: 'webgl_animation_keyframes_vroid',
+					title: 'Character Animation',
+					description: 'A anime-style character jumps forward'
+				},
+				{
+					file: 'webgl_animation_keyframes_flag',
+					title: 'Flag Animation',
+					description: 'A flag waving in the wind'
+				},
+				{
+					file: 'webgl_animation_keyframes_bird',
+					title: 'Bird Animation',
+					description: 'A bird flying with wing flapping animation'
+				},
+				{
+					file: 'webgl_animation_keyframes_beer',
+					title: 'Beer Walk',
+					description: 'A beer bottle walking animation'
+				},
+				{
+					file: 'webgl_animation_keyframes_animals',
+					title: 'Animal Animations',
+					description: 'Multiple animals with different animations'
+				},
+				{
+					file: 'webgl_animation_keyframes_humans',
+					title: 'Human Animations',
+					description: 'Multiple humanoid characters with different animations'
+				}
+			]
+		};
+
+		init();
+
+		function init() {
+			viewSrcButton.style.display = 'none';
+
+			// Create example cards
+			for (const category in examples) {
+				const categoryExamples = examples[category];
+
+				for (let i = 0; i < categoryExamples.length; i++) {
+					const example = categoryExamples[i];
+					const link = createLink(example);
+					content.appendChild(link);
+
+					links[example.file] = link;
+					validRedirects.set(example.file, example.file + '.html');
+				}
+			}
+
+			// Check URL hash
+			if (window.location.hash !== '') {
+				const file = window.location.hash.substring(1);
+				if (validRedirects.has(file)) {
+					selectFile(file);
+					viewer.src = validRedirects.get(file);
+					viewer.style.display = 'unset';
+				}
+			}
+
+			// Set default placeholder
+			if (viewer.src === '') {
+				viewer.srcdoc = document.getElementById('PlaceholderHTML').innerHTML;
+				viewer.style.display = 'unset';
+			}
+
+			// Event listeners
+			filterInput.addEventListener('input', updateFilter);
+			panelScrim.addEventListener('click', function () {
+				panel.classList.remove('open');
+			});
+		}
+
+		function createLink(example) {
+			const template = `
+				<div class="card" data-file="${example.file}">
+					<a href="${example.file}.html" target="viewer">
+						<div class="cover">
+							<img src="screenshots/${example.file}.png" alt="${example.title}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNDAwIiBoZWlnaHQ9IjMwMCIgdmlld0JveD0iMCAwIDQwMCAzMDAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSI0MDAiIGhlaWdodD0iMzAwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjEwMCIgeT0iNzUiIHdpZHRoPSIyMDAiIGhlaWdodD0iMTUwIiBmaWxsPSIjRjBGMEYwIi8+CjxyZWN0IHg9IjExMCIgeT0iODUiIHdpZHRoPSIxODAiIGhlaWdodD0iMTMwIiBmaWxsPSIjRjVGNUY1Ii8+CjxyZWN0IHg9IjEyMCIgeT0iOTUiIHdpZHRoPSIxNjAiIGhlaWdodD0iMTEwIiBmaWxsPSIjRjBGMEYwIi8+CjxyZWN0IHg9IjEzMCIgeT0iMjAwIiB3aWR0aD0iMTQwIiBoZWlnaHQ9IjEwIiBmaWxsPSIjRjVGNUY1Ii8+Cjwvc3ZnPgo='" />
+						</div>
+						<div class="title">${example.title}</div>
+					</a>
+				</div>
+			`;
+
+			const link = createElementFromHTML(template);
+
+			link.querySelector('a[target="viewer"]').addEventListener('click', function (event) {
+				if (event.button !== 0 || event.ctrlKey || event.altKey || event.metaKey) return;
+				selectFile(example.file);
+			});
+
+			return link;
+		}
+
+		function selectFile(file) {
+			if (selected !== null) links[selected].classList.remove('selected');
+
+			links[file].classList.add('selected');
+			window.location.hash = file;
+			viewer.focus();
+			viewer.style.display = 'unset';
+
+			panel.classList.remove('open');
+			selected = file;
+
+			// Show view source button
+			viewSrcButton.style.display = 'flex';
+			viewSrcButton.href = file + '.html';
+			viewSrcButton.title = 'View source code for ' + getName(file);
+		}
+
+		function updateFilter() {
+			const searchTerm = filterInput.value.toLowerCase().trim();
+
+			for (const category in examples) {
+				const categoryExamples = examples[category];
+				let hasVisibleExamples = false;
+
+				for (let i = 0; i < categoryExamples.length; i++) {
+					const example = categoryExamples[i];
+					const link = links[example.file];
+					const matches = example.title.toLowerCase().includes(searchTerm) ||
+						example.description.toLowerCase().includes(searchTerm);
+
+					if (matches) {
+						link.classList.remove('hidden');
+						hasVisibleExamples = true;
+					} else {
+						link.classList.add('hidden');
+					}
+				}
+
+				// Hide/show category headers
+				const categoryHeader = content.querySelector(`h2[data-category="${category}"]`);
+				if (categoryHeader) {
+					if (hasVisibleExamples) {
+						categoryHeader.classList.remove('hidden');
+					} else {
+						categoryHeader.classList.add('hidden');
+					}
+				}
+			}
+		}
+
+		function getName(file) {
+			const name = file.split('_');
+			name.shift();
+			return name.join(' / ');
+		}
+
+		function createElementFromHTML(htmlString) {
+			const div = document.createElement('div');
+			div.innerHTML = htmlString.trim();
+			return div.firstChild;
+		}
+	</script>
+
+	<template id="PlaceholderHTML">
+		<!DOCTYPE html>
+		<html lang="en">
+
+		<head>
+			<meta charset="utf-8">
+			<title>AnimaX Examples</title>
+			<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+			<style>
+				html,
+				body {
+					height: 100%;
+					margin: 0;
+					padding: 0;
+					font-family: 'Roboto Mono', monospace;
+					background-color: #f0f0f0;
+					color: #444;
+				}
+
+				body {
+					display: flex;
+					align-items: center;
+					justify-content: center;
+					user-select: none;
+				}
+
+				.placeholder {
+					text-align: center;
+					padding: 40px;
+				}
+
+				.placeholder h1 {
+					font-size: 24px;
+					margin-bottom: 16px;
+					color: #049EF4;
+				}
+
+				.placeholder p {
+					font-size: 16px;
+					color: #666;
+				}
+			</style>
+		</head>
+
+		<body>
+			<div class="placeholder">
+				<h1>AnimaX Examples</h1>
+				<p>Select an example from the sidebar to get started</p>
+			</div>
+		</body>
+
+		</html>
+	</template>
+</body>
+
+</html>

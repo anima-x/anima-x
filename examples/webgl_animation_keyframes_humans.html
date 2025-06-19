@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<title>animax - animation - keyframes</title>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+	<style>
+		body {
+			background-color: #a0a0a0;
+			color: #000;
+			margin: 0;
+			padding: 0;
+			overflow: hidden;
+		}
+
+		a {
+			color: #f00;
+		}
+	</style>
+</head>
+
+<body>
+	<div id="container"></div>
+
+	<!-- Three.js CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
+
+	<!-- Three.js Addons CDN -->
+	<script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/DRACOLoader.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three/examples/js/controls/OrbitControls.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three/examples/js/environments/RoomEnvironment.js"></script>
+
+	<!-- GUI Library -->
+	<script src="https://cdn.jsdelivr.net/npm/lil-gui@0.19.1/dist/lil-gui.umd.min.js"></script>
+
+	<script>
+		let mixer;
+		let skeleton;
+		let mixers = []; // Store all animation mixers
+		let skeletons = []; // Store all skeleton helpers
+		let gui; // GUI controller
+		let models = []; // Store all loaded models
+
+		const clock = new THREE.Clock();
+
+		// Settings object for GUI controls
+		const settings = {
+			'show model': true,
+			'show skeleton': true,
+			'deactivate all': function () {
+				mixers.forEach(mixer => {
+					if (mixer) mixer.stopAllAction();
+				});
+			},
+			'activate all': function () {
+				mixers.forEach(mixer => {
+					if (mixer) {
+						mixer._actions.forEach(action => action.play());
+					}
+				});
+			},
+			'pause/continue': function () {
+				mixers.forEach(mixer => {
+					if (mixer) {
+						if (mixer.timeScale === 0) {
+							mixer.timeScale = 1;
+						} else {
+							mixer.timeScale = 0;
+						}
+					}
+				});
+			},
+			'make single step': function () {
+				mixers.forEach(mixer => {
+					if (mixer) {
+						mixer.update(settings['modify step size']);
+					}
+				});
+			},
+			'modify step size': 0.01
+		};
+
+		// Functions for visibility controls
+		function showModel(value) {
+			models.forEach(model => {
+				if (model) model.visible = value;
+			});
+		}
+
+		function showSkeleton(value) {
+			skeletons.forEach(skeleton => {
+				if (skeleton) skeleton.visible = value;
+			});
+		}
+
+		const container = document.getElementById('container');
+
+		const renderer = new THREE.WebGLRenderer({
+			antialias: true,
+			powerPreference: 'high-performance',
+			precision: 'highp'
+		});
+		renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Limit maximum pixel ratio
+		renderer.setSize(window.innerWidth, window.innerHeight);
+		renderer.shadowMap.enabled = true;
+		renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Use better shadow quality
+		renderer.outputColorSpace = THREE.SRGBColorSpace; // Use sRGB color space
+		renderer.toneMapping = THREE.ACESFilmicToneMapping; // Use ACES Filmic tone mapping
+		renderer.toneMappingExposure = 1.0;
+		container.appendChild(renderer.domElement);
+
+		const scene = new THREE.Scene();
+		scene.background = new THREE.Color(0xa0a0a0);
+		scene.fog = new THREE.Fog(0xa0a0a0, 10, 50);
+
+		const hemiLight = new THREE.HemisphereLight(0xffffff, 0x8d8d8d, 3);
+		hemiLight.position.set(0, 20, 0);
+		scene.add(hemiLight);
+
+		const dirLight = new THREE.DirectionalLight(0xffffff, 3);
+		dirLight.position.set(3, 10, 10);
+		dirLight.castShadow = true;
+		dirLight.shadow.camera.top = 5;
+		dirLight.shadow.camera.bottom = -5;
+		dirLight.shadow.camera.left = -5;
+		dirLight.shadow.camera.right = 5;
+		dirLight.shadow.camera.near = 0.1;
+		dirLight.shadow.camera.far = 40;
+		scene.add(dirLight);
+
+		// ground
+		const mesh = new THREE.Mesh(new THREE.PlaneGeometry(100, 100), new THREE.MeshPhongMaterial({ color: 0xcbcbcb, depthWrite: false }));
+		mesh.rotation.x = - Math.PI / 2;
+		mesh.receiveShadow = true;
+		scene.add(mesh);
+
+		const camera = new THREE.PerspectiveCamera(40, window.innerWidth / window.innerHeight, 1, 100);
+		camera.position.set(0, 2, 8);
+		camera.lookAt(0, 1, 0);
+
+		const controls = new THREE.OrbitControls(camera, renderer.domElement);
+		controls.target.set(0, 1, 0);
+		controls.update();
+		controls.enablePan = false;
+		controls.enableDamping = true;
+
+		// Create GUI
+		gui = new lil.GUI();
+		gui.domElement.style.position = 'absolute';
+		gui.domElement.style.top = '10px';
+		gui.domElement.style.right = '10px';
+
+		// Create the three folders as specified
+		const folder1 = gui.addFolder('Visibility');
+		const folder2 = gui.addFolder('Activation/Deactivation');
+		const folder3 = gui.addFolder('Pausing/Stepping');
+
+		// Add controls to folders
+		folder1.add(settings, 'show model').onChange(showModel);
+		folder1.add(settings, 'show skeleton').onChange(showSkeleton);
+		folder2.add(settings, 'deactivate all');
+		folder2.add(settings, 'activate all');
+		folder3.add(settings, 'pause/continue');
+
+		// Open all folders by default
+		folder1.open();
+		folder2.open();
+		folder3.open();
+
+		const dracoLoader = new THREE.DRACOLoader();
+		dracoLoader.setDecoderPath('https://cdn.jsdelivr.net/npm/three/examples/jsm/libs/draco/gltf/');
+
+		const loader = new THREE.GLTFLoader();
+		loader.setDRACOLoader(dracoLoader);
+
+		// Define model file paths, positions and scales
+		const modelConfigs = [
+			{
+				path: 'animations/boxer-animation.glb',
+				position: new THREE.Vector3(-2, 0, 0),
+				scale: 3.0  // Humanoid size
+			},
+			{
+				path: 'animations/toy-kick.glb',
+				position: new THREE.Vector3(0, 0, 0),
+				scale: 0.015  // Medium size
+			},
+			{
+				path: 'animations/panda_down.glb',
+				position: new THREE.Vector3(2, 0, 0),
+				scale: 2.7  // Humanoid size
+			}
+		];
+
+		// Load all models
+		let loadedModels = 0;
+		modelConfigs.forEach((modelData, index) => {
+			loader.load(modelData.path, function (gltf) {
+				const model = gltf.scene;
+
+				// Calculate model bounding box
+				const box = new THREE.Box3().setFromObject(model);
+				const center = box.getCenter(new THREE.Vector3());
+				const size = box.getSize(new THREE.Vector3());
+
+				// Use preset scale ratio
+				const maxDim = Math.max(size.x, size.y, size.z);
+				const scale = modelData.scale / maxDim;
+				model.scale.setScalar(scale);
+
+				// Set model position
+				model.position.copy(modelData.position);
+
+				// Calculate model lowest point and adjust Y position
+				const minY = box.min.y * scale;
+				model.position.y = -minY;
+
+				// Enable model shadows
+				model.traverse(function (object) {
+					if (object.isMesh) {
+						object.castShadow = true;
+						object.receiveShadow = true;
+					}
+				});
+
+				scene.add(model);
+				models.push(model);
+
+				// Create skeleton helper
+				const skeleton = new THREE.SkeletonHelper(model);
+				skeleton.visible = true;
+				skeletons.push(skeleton);
+				scene.add(skeleton);
+
+				// Create animation mixer
+				const mixer = new THREE.AnimationMixer(model);
+				mixers.push(mixer);
+
+				const action = mixer.clipAction(gltf.animations[0]);
+				action.play();
+
+				loadedModels++;
+				if (loadedModels === modelConfigs.length) {
+					renderer.setAnimationLoop(animate);
+				}
+			}, undefined, function (e) {
+				console.error(e);
+			});
+		});
+
+		window.onresize = function () {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			renderer.setSize(window.innerWidth, window.innerHeight);
+		};
+
+		function animate() {
+			const delta = clock.getDelta();
+
+			// Update all animation mixers
+			mixers.forEach(mixer => {
+				if (mixer) mixer.update(delta);
+			});
+
+			controls.update();
+			renderer.render(scene, camera);
+		}
+	</script>
+</body>
+
+</html>
