@@ -1,6 +1,6 @@
 # AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models
 
-## 🏠 [Project Page](anima-x.github.io) | [Paper]()
+## 🏠 [Project Page](https://anima-x.github.io) | [Paper]()
 
 ![teaser](./assets/doc/teaser.jpg)
 
