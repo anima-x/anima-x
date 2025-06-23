@@ -1,16 +1,13 @@
-## Hi there 👋
+# AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models
 
-<!--
-**anima-x/anima-x** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+## 🏠 [Project Page](https://anima-x.github.io) | [Paper]()
 
-Here are some ideas to get you started:
+![teaser](./assets/doc/teaser.jpg)
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+AnimaX is a feed-forward 3D animation framework that bridges the motion priors of video diffusion models with the controllable structure of skeleton-based animation.
+Traditional motion synthesis methods are either restricted to fixed skeletal topologies or require costly optimization in high-dimensional deformation spaces.
+In contrast, AnimaX effectively transfers video-based motion knowledge to the 3D domain, animating diverse articulated meshes in arbitrary skeletal systems with text conditions.
+
+## 📢 News
+
+## Citation
