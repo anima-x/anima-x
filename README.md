@@ -10,13 +10,11 @@ In contrast, AnimaX effectively transfers video-based motion knowledge to the 3D
 
 ## 📢 News
 
-## Citation
+- **2025-06-25:** Technical report is released on Arxiv.
 
-```
-@article{huang2025animax,
-  title={AnimaX: Animating the Inanimate in 3D with Joint Video-Pose Diffusion Models}, 
-  author={Huang, Zehuan and Feng, Haoran and Sun, Yangtian and Guo, Yuanchen and Cao, Yanpei and Sheng, Lu},
-  journal={arXiv preprint arXiv:2506.19851},
-  year={2025}
-}
-```
+## 📋 TODO
+
+Stay tuned!
+
+- [ ] Release training and evaluation dataset
+- [ ] Release code and model
